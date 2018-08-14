@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean id="helloWorldImpl1" class="bxz.spring.aop.HelloWorldImpl1" />
+    <bean id="helloWorldImpl2" class="bxz.spring.aop.HelloWorldImpl2" />
+    <bean id="timeHandler" class="bxz.spring.aop.TimeHandler" />
+    <bean id="logHandler" class="bxz.spring.aop.LogHandler" />
+
+    <!--
+        要想让logHandler在timeHandler前使用有两个办法：
+        1）aspect里面有一个order属性，order属性的数字就是横切关注点的顺序
+        2）把logHandler定义在timeHandler前面，Spring默认以aspect的定义顺序作为织入顺序
+
+        只想织入接口中的某些方法
+        <aop:pointcut id="addTime" expression="execution(* com.xrq.aop.HelloWorld.print*(..))" />
+        表示timeHandler只会织入HelloWorld接口print开头的方法
+
+        proxy-target-class="true" 强制使用CGLIB生成代理
+
+    -->
+    <aop:config proxy-target-class="true">
+        <aop:aspect id="time" ref="timeHandler">
+            <aop:pointcut id="addAllMethod" expression="execution(* bxz.spring.aop.HelloWorldImpl1.print*(..))" />
+            <aop:before method="printTime" pointcut-ref="addAllMethod" />
+            <aop:after method="printTime" pointcut-ref="addAllMethod" />
+        </aop:aspect>
+        <aop:aspect id="log" ref="logHandler" order="2">
+            <aop:pointcut id="printLog" expression="execution(* bxz.spring.aop.HelloWorld.*(..))" />
+            <aop:before method="LogBefore" pointcut-ref="printLog" />
+            <aop:after method="LogAfter" pointcut-ref="printLog" />
+        </aop:aspect>
+    </aop:config>
+
+</beans>
