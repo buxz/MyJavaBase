@@ -38,6 +38,7 @@ public class HashMapTest {
         // 添加操作
         map.put("one", random.nextInt(10));
         map.put("two", random.nextInt(10));
+
         map.put("three", random.nextInt(10));
 
         // 打印出map
